@@ -1,0 +1,35 @@
+server {
+    listen 8080;
+    server_name localhost;
+
+    root /var/www/html/smartech_platform;  # Le bon chemin vers votre dossier
+    index index.html index.htm index.php;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+server {
+    listen 8080;
+    server_name mail.smarttech.local;
+
+    root /opt/www/roundcubemail-1.6.9/vendor/roundcube;
+
+    index index.php index.html;
+
+    location /mail {
+        root /opt/iredmail/http;
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;  # Remplace par ta version PHP
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
